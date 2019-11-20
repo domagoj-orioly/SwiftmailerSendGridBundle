@@ -64,4 +64,22 @@ class BundleInitializationTest extends BaseBundleTestCase
 
         $this->assertSame(0, $mailer->send($message)); // This should gives us 0 for no email sent
     }
+
+    public function testSimpleMailWithReplyToField()
+    {
+        $message = (new \Swift_Message('[Test] SwiftSendGrid'))
+            ->setFrom('noreply@swiftsendgrid.bundle')
+            ->setTo('nobody@send.grid')
+            ->setBody('Test body.', 'text/plain')
+            ->setReplyTo('demo@mail.demo', 'Demo')
+        ;
+        $transport = $this->getContainer()->get('swiftmailer.mailer.transport.expertcoder_swift_mailer.send_grid');
+        $transport->setHttpClientOptions([
+            'curl' => [CURLOPT_TIMEOUT => 1],
+        ]);
+        $mailer = new \Swift_Mailer($transport);
+        $result = $mailer->send($message);
+
+        $this->assertSame(0, $mailer->send($message)); // This should gives us 0 for no email sent
+    }
 }
