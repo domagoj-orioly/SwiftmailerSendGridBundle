@@ -182,6 +182,18 @@ class SendGridTransport implements Swift_Transport
         $mail->setFrom(new SendGrid\Mail\From($fromEmail, $fromName));
         $mail->setSubject($message->getSubject());
 
+        if ($replyToArray = $message->getReplyTo()) {
+            if (is_array($replyToArray)) {
+                $replyToAddress = key($replyToArray);
+                $replyToName = reset($replyToArray);
+                $replyTo = new SendGrid\Mail\ReplyTo($replyToAddress, $replyToName);
+            } else {
+                $replyTo = new SendGrid\Mail\ReplyTo($replyToArray);
+            }
+
+            $mail->setReplyTo($replyTo);
+        }
+
         // extract content type from body to prevent multi-part content-type error
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $contentType = $finfo->buffer($message->getBody());
